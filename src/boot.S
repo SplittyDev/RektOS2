@@ -29,7 +29,7 @@ _stop:
   hlt
   jmp _stop
 
-.gdt_reload_segments:
+gdt_reload_segments:
   mov $0x10, %ax
   mov %ax, %ds
   mov %ax, %es
