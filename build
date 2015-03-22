@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+export PATH="$HOME/opt/cross/bin:$PATH"
+
+rm -f kernel.iso
+cp kernel.ld src/kernel.ld
+cp makefile src/makefile
+cd src
+make
+rm -f kernel.ld
+rm -f makefile
+mv kernel ../kernel
+cd ../
+
+cp kernel iso/boot/kernel.bin
+grub-mkrescue -o kernel.iso iso
+
+read
+
+qemu-system-x86_64 -d int -cdrom kernel.iso
