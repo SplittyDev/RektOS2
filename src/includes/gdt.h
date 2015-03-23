@@ -6,7 +6,7 @@
 #define GDT_ENTRIES 5
 
 static uint64_t gdt[GDT_ENTRIES];
-void gdt_create_descriptor (uint32_t, uint32_t, uint16_t);
+void gdt_create_descriptor (uint64_t i, uint32_t, uint32_t, uint16_t);
 void gdt_init (void);
 void gdt_load (void);
 extern void gdt_reload_segments (void);

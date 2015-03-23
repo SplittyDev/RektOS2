@@ -37,6 +37,7 @@ void putc (const char chr) {
       break;
     // Line feed
     case '\n':
+      terminal_x = 0;
       terminal_y++;
       break;
     default:

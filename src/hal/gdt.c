@@ -9,7 +9,7 @@ struct {
   .pointer = gdt,
 };
 
-void gdt_create_descriptor (uint32_t base, uint32_t limit, uint16_t flag) {
+void gdt_create_descriptor (uint64_t i, uint32_t base, uint32_t limit, uint16_t flag) {
   uint64_t descriptor;
   descriptor  = limit         & 0x000F0000;
   descriptor |= (flag <<  8)  & 0x00F0FF00;
@@ -18,14 +18,15 @@ void gdt_create_descriptor (uint32_t base, uint32_t limit, uint16_t flag) {
   descriptor <<= 32;
   descriptor |=  base << 16;
   descriptor |= limit         & 0x0000FFFF;
+  gdt[i] = descriptor;
 }
 
 void gdt_init (void) {
-  gdt_create_descriptor (0, 0, 0); // Null descriptor
-  gdt_create_descriptor (0, 0x000FFFFF, (GDT_CODE_PL0));
-  gdt_create_descriptor (0, 0x000FFFFF, (GDT_DATA_PL0));
-  gdt_create_descriptor (0, 0x000FFFFF, (GDT_CODE_PL3));
-  gdt_create_descriptor (0, 0x000FFFFF, (GDT_DATA_PL3));
+  gdt_create_descriptor (0, 0, 0, 0); // Null descriptor
+  gdt_create_descriptor (1, 0, 0x000FFFFF, (GDT_CODE_PL0));
+  gdt_create_descriptor (2, 0, 0x000FFFFF, (GDT_DATA_PL0));
+  gdt_create_descriptor (3, 0, 0x000FFFFF, (GDT_CODE_PL3));
+  gdt_create_descriptor (4, 0, 0x000FFFFF, (GDT_DATA_PL3));
   gdt_load ();
   gdt_reload_segments ();
 }

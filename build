@@ -9,6 +9,7 @@ make
 rm -f kernel.ld
 rm -f makefile
 mv kernel ../kernel
+find . -name "*.o" -type f -delete
 cd ../
 
 cp kernel iso/boot/kernel.bin
