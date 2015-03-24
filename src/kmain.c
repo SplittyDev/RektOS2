@@ -26,6 +26,9 @@ void init (void) {
   idt_init ();
   puts ("[OK] Setting up IDT\n");
 
+  puts ("Dividing by zero\n");
+  putc (1 / 0);
+
   while (true) {
     asm ("cli; hlt");
   }

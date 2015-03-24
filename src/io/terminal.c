@@ -80,11 +80,11 @@ void scroll (void) {
 }
 
 void move_cursor (void) {
-  uint8_t attr = terminal_y * 80 + terminal_x;
-  outb (0x3D4, 14);
-  outb (0x3D5, attr >> 8);
-  outb (0x3D4, 15);
-  outb (0x3D5, attr);
+  uint16_t attr = terminal_y * 80 + terminal_x;
+  outw (0x3D4, 14);
+  outw (0x3D5, attr >> 8);
+  outw (0x3D4, 15);
+  outw (0x3D5, attr);
 }
 
 uint8_t makecolor (uint8_t fc, uint8_t bc) {
