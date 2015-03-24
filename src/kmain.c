@@ -24,7 +24,15 @@ void init (void) {
   pic_init ();
   puts ("[OK] Setting up PIC\n");
 
-  // Test IDT/PIC
-  asm volatile ("int $0x0");
-  asm volatile ("hlt");
+  // Tests
+  puts ("Testing divide by zero\n");
+  int i = 10 / 0;
+  puts ("Testing overflow\n");
+  int8_t x = 99999999999999999999;
+
+  puts ("lolwtf");
+
+  while (true) {
+    puts ("x");
+  }
 }

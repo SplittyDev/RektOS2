@@ -31,12 +31,35 @@ _stop:
   hlt
   jmp _stop
 
-.align 4
+#isr_wrapper:
+#  pushal
+#  cld
+#  call interrupt_handler
+#  popal
+#  iret
+
 isr_wrapper:
-  pushal
-  cld
+  push %ebp
+  push %edi
+  push %esi
+  push %edx
+  push %ecx
+  push %ebx
+  push %eax
+
+  push %esp
   call interrupt_handler
-  popal
+  add $4, %esp
+
+  pop %eax
+  pop %ebx
+  pop %ecx
+  pop %edx
+  pop %esi
+  pop %edi
+  pop %ebp
+
+  add $8, %esp
   iret
 
 gdt_reload_segments:
@@ -48,7 +71,6 @@ gdt_reload_segments:
   mov %ax, %ss
   ljmp $0x8, $.1
   ret
-.1:
 
 # Interrupt Service Routines
 .macro isr num
@@ -66,13 +88,13 @@ gdt_reload_segments:
 		jmp isr_wrapper
 .endm
 
-.macro sysf num, func
-	.global sysf_\num
-	sysf_\num:
-		pushl $0
-		pushl $\num
-		jmp sysf_\func
-.endm
+#.macro sysf num, func
+#	.global sysf_\num
+#	sysf_\num:
+#		pushl $0
+#		pushl $\num
+#		jmp sysf_\func
+#.endm
 
 # Exceptions
 isr 0
@@ -94,20 +116,19 @@ isr 15
 isr 16
 exc 17
 isr 18
-isr 19
-
-isr 20
-isr 21
-isr 22
-isr 23
-isr 24
-isr 25
-isr 26
-isr 27
-isr 28
-isr 29
-isr 30
-isr 31
+#isr 19
+#isr 20
+#isr 21
+#isr 22
+#isr 23
+#isr 24
+#isr 25
+#isr 26
+#isr 27
+#isr 28
+#isr 29
+#isr 30
+#isr 31
 
 # IRQs
 isr 32
@@ -128,7 +149,10 @@ isr 46
 isr 47
 
 # Syscalls
-# None.
+isr 51 #  4 sys_write
+
+# GDT jump thing
+.1:
 
 .section .bss
 
