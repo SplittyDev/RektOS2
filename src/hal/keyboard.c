@@ -5,7 +5,24 @@
 #include <terminal.h>
 
 void keyboard_init (void) {
+  // Install handler
   keyboard_install_handler ();
+
+  // Empty buffer
+  while (inb (CONTROL_REGISTER) & 0x1) {
+    inb (DATA_REGISTER);
+  }
+
+  // Clear LEDs
+  keyboard_send_command (0xED);
+  keyboard_send_command (0);
+
+  // Fastest refresh-rate
+  keyboard_send_command (0xF3);
+  keyboard_send_command (0);
+
+  // Activate keyboard
+  keyboard_send_command (0xF4);
 }
 
 void keyboard_install_handler (void) {
@@ -14,6 +31,14 @@ void keyboard_install_handler (void) {
 
 void keyboard_uninstall_handler (void) {
   idt_uninstall_handler (KEYBOARD_IRQ);
+}
+
+void keyboard_send_command (uint8_t com) {
+  do {
+    while (inb (CONTROL_REGISTER) & 0x2);
+    outb (DATA_REGISTER, com);
+    while ((inb (CONTROL_REGISTER) & 0x1) == 0);
+  } while (inb (DATA_REGISTER) == 0xFE);
 }
 
 uint8_t keymap_en[128] = {

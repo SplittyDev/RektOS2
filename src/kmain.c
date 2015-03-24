@@ -7,13 +7,9 @@
 #include <keyboard.h>
 
 void test (char *msg, void (*func)(void)) {
-  puts ("[Init] ");
   puts (msg);
   putc ('\n');
   func ();
-  puts ("[ OK ] ");
-  puts (msg);
-  putc ('\n');
 }
 
 // Main entry point
@@ -25,22 +21,23 @@ void init (void) {
   terminal_init ();
 
   // Setup GDT
-  test ("GDT", gdt_init);
+  test ("Setting up GDT...", gdt_init);
 
   // Setup PIC
-  test ("PIC", pic_init);
+  test ("Remapping PIC...", pic_init);
 
   // Setup IDT
-  test ("IDT", idt_init);
+  test ("Setting up IDT...", idt_init);
 
   // Setup PIT with 100hz
-  test ("PIT", pit_init);
+  test ("Initializing PIT...", pit_init);
 
   // Setup Keyboard
-  test ("Keyboard", keyboard_init);
+  test ("Initializing Keyboard...", keyboard_init);
 
   // Enable Interrupts
   asm volatile ("sti");
 
-  while (true);
+  while (true) {
+  }
 }
