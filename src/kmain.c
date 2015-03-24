@@ -4,6 +4,17 @@
 #include <idt.h>
 #include <pic.h>
 #include <pit.h>
+#include <keyboard.h>
+
+void test (char *msg, void (*func)(void)) {
+  puts ("[Init] ");
+  puts (msg);
+  putc ('\n');
+  func ();
+  puts ("[ OK ] ");
+  puts (msg);
+  putc ('\n');
+}
 
 // Main entry point
 void init (void) {
@@ -14,20 +25,19 @@ void init (void) {
   terminal_init ();
 
   // Setup GDT
-  gdt_init ();
-  puts ("[OK] Setting up GDT\n");
+  test ("GDT", gdt_init);
 
   // Setup PIC
-  pic_init ();
-  puts ("[OK] Setting up PIC\n");
+  test ("PIC", pic_init);
 
   // Setup IDT
-  idt_init ();
-  puts ("[OK] Setting up IDT\n");
+  test ("IDT", idt_init);
 
   // Setup PIT with 100hz
-  pit_init ();
-  puts ("[OK] Initializing PIT\n");
+  test ("PIT", pit_init);
+
+  // Setup Keyboard
+  test ("Keyboard", keyboard_init);
 
   // Enable Interrupts
   asm volatile ("sti");

@@ -17,4 +17,4 @@ grub-mkrescue -o kernel.iso iso
 
 read
 
-qemu-system-x86_64 -d int -cdrom kernel.iso
+qemu-system-x86_64 -k en-us -d int -cdrom kernel.iso

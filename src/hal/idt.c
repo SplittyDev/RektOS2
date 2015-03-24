@@ -118,6 +118,10 @@ void *irq_handlers[16] = {
 void idt_install_handler (int8_t irq,
   void (*handler)(struct cpu_state *frame)) {
   irq_handlers[irq] = handler;
+  puts ("Installed IRQ handler on IRQ ");
+  uint8_t buf[13];
+  puts (itoa (irq, buf));
+  puts (".\n");
 }
 
 void idt_uninstall_handler (int8_t irq) {
