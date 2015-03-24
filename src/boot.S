@@ -20,46 +20,44 @@
 .global isr_wrapper
 .global gdt_reload_segments
 
+# Main entry point
 _start:
-  # Point stack pointer to stack
+  # Point stack pointer to kernel stack
   mov $kernel_stack, %esp
-  # Call kmain
+
+  # Call init in kmain.c
   call init
 
+# Halt if we ever return from init
 _stop:
   cli
   hlt
   jmp _stop
 
-#isr_wrapper:
-#  pushal
-#  cld
-#  call interrupt_handler
-#  popal
-#  iret
-
+# Backup registers
+# and call interrupt handler in hal/idt.c
 isr_wrapper:
-  push %ebp
-  push %edi
-  push %esi
-  push %edx
-  push %ecx
-  push %ebx
+  pusha
+  push %ds
+  push %es
+  push %fs
+  push %gs
+  mov $0x10, %ax
+  mov %ax, %ds
+  mov %ax, %es
+  mov %ax, %fs
+  mov %ax, %gs
+  mov %esp, %eax
   push %eax
-
-  push %esp
-  call interrupt_handler
-  add $4, %esp
-
+  mov $interrupt_handler, %eax
+  call %eax
   pop %eax
-  pop %ebx
-  pop %ecx
-  pop %edx
-  pop %esi
-  pop %edi
-  pop %ebp
-
-  add $8, %esp
+  pop %gs
+  pop %fs
+  pop %es
+  pop %ds
+  popa
+  add $0x8, %esp
   iret
 
 gdt_reload_segments:
@@ -69,13 +67,17 @@ gdt_reload_segments:
   mov %ax, %fs
   mov %ax, %gs
   mov %ax, %ss
-  ljmp $0x8, $.1
+  ljmp $0x8, $flushgdt
+  ret
+
+flushgdt:
   ret
 
 # Interrupt Service Routines
 .macro isr num
 	.global isr\num
 	isr\num:
+    cli
 		pushl $0
 		pushl $\num
 		jmp isr_wrapper
@@ -114,21 +116,23 @@ exc 13
 exc 14
 isr 15
 isr 16
-exc 17
+isr 17
 isr 18
-#isr 19
-#isr 20
-#isr 21
-#isr 22
-#isr 23
-#isr 24
-#isr 25
-#isr 26
-#isr 27
-#isr 28
-#isr 29
-#isr 30
-#isr 31
+
+// Reserved exceptions
+isr 19
+isr 20
+isr 21
+isr 22
+isr 23
+isr 24
+isr 25
+isr 26
+isr 27
+isr 28
+isr 29
+isr 30
+isr 31
 
 # IRQs
 isr 32
@@ -152,7 +156,7 @@ isr 47
 isr 51 #  4 sys_write
 
 # GDT jump thing
-.1:
+# .1:
 
 .section .bss
 

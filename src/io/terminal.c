@@ -31,6 +31,10 @@ void putc (const char chr) {
       if (terminal_x != 0)
         terminal_x--;
       break;
+    // Tab
+    case 0x09:
+      terminal_x = (terminal_x + 4) & ~(4 - 1);
+      break;
     // Carriage return
     case '\r':
       terminal_x = 0;
@@ -44,6 +48,14 @@ void putc (const char chr) {
       vmem[terminal_y * 80 + terminal_x] = chr | (attrib << 8);
       terminal_x++;
   }
+
+  // Check for overflow
+  if (terminal_x >= 80) {
+    terminal_x = 0;
+    terminal_y++;
+  }
+
+  // Scroll and update the cursor
   scroll ();
   move_cursor ();
 }

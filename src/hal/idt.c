@@ -3,17 +3,19 @@
 #include <idt.h>
 #include <terminal.h>
 #include <ports.h>
+#include <string.h>
 
 struct {
   uint16_t limit;
   void* pointer;
 } __attribute__((packed)) idtp = {
-  .limit = (sizeof(struct idt_entry) * 255) - 1,
+  .limit = (sizeof(struct idt_entry) * 256) - 1,
   .pointer = &idt,
 };
 
 void idt_init (void) {
-  memset ((uint8_t *)&idt, 0, sizeof(struct idt_entry) * 255);
+  // Clear IDT
+  memset (&idt, 0, sizeof(struct idt_entry) * 256);
 
   // Exceptions
   idt_set_gate (0, (unsigned)isr0, 0x08, 0x8E);
@@ -33,10 +35,12 @@ void idt_init (void) {
 	idt_set_gate (14, (unsigned)exc14, 0x08, 0x8E);
 	idt_set_gate (15, (unsigned)isr15, 0x08, 0x8E);
 	idt_set_gate (16, (unsigned)isr16, 0x08, 0x8E);
-	idt_set_gate (17, (unsigned)exc17, 0x08, 0x8E);
+  // Not sure if it is isr17 or exc17.
+  // isr17 will probably do it for now.
+	idt_set_gate (17, (unsigned)isr17, 0x08, 0x8E);
 	idt_set_gate (18, (unsigned)isr18, 0x08, 0x8E);
 
-  /*
+  // Reserved exceptions
   idt_set_gate (19, (unsigned)isr19, 0x08, 0x8E);
 	idt_set_gate (20, (unsigned)isr20, 0x08, 0x8E);
 	idt_set_gate (21, (unsigned)isr21, 0x08, 0x8E);
@@ -50,7 +54,6 @@ void idt_init (void) {
 	idt_set_gate (29, (unsigned)isr29, 0x08, 0x8E);
 	idt_set_gate (30, (unsigned)isr30, 0x08, 0x8E);
 	idt_set_gate (31, (unsigned)isr31, 0x08, 0x8E);
-  */
 
 	// Common
 	idt_set_gate (32, (unsigned)isr32, 0x08, 0x8E);
@@ -70,6 +73,7 @@ void idt_init (void) {
 	idt_set_gate (46, (unsigned)isr32, 0x08, 0x8E);
 	idt_set_gate (47, (unsigned)isr32, 0x08, 0x8E);
 
+  // Load IDT
   idt_load ();
 }
 
@@ -87,44 +91,75 @@ void idt_set_gate (uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
 
 uint8_t* exception_messages[] =
 {
-	"*** DIVIDE BY ZERO EXCEPTION\n",
-	"*** DEBUG EXCEPTION\n",
-	"*** NON MASKABLE INTERRUPT EXCEPTION\n",
-	"*** INTO DETECTED OVERFLOW EXCEPTION\n",
-	"*** OUT OF BOUNDS EXCEPTION\n",
-	"*** INVALID OPCODE EXCEPTION\n",
-	"*** NO COPROCESSOR EXCEPTION\n",
-	"*** DOUBLE FAULT EXCEPTION\n",
-	"*** COPROCESSOR SEGMENT OVERRUN EXCEPTION\n",
-	"*** BAD TSS EXCEPTION\n",
-	"*** SEGMENT NOT PRESENT EXCEPTION\n",
-	"*** STACK FAULT EXCEPTION\n",
-	"*** GENERAL PROTECTION FAULT EXCEPTION\n",
-	"*** PAGE FAULT EXCEPTION\n",
-	"*** UNKNOWN INTERRUPT EXCEPTION\n",
-	"*** COPROCESSOR FAULT EXCEPTION\n",
-	"*** ALIGNMENT CHECK EXCEPTION\n",
-	"*** MACHINE CHECK EXCEPTION\n",
+	"*** DIVIDE BY ZERO EXCEPTION\n",              //  0
+	"*** DEBUG EXCEPTION\n",                       //  1
+	"*** NON MASKABLE INTERRUPT EXCEPTION\n",      //  2
+	"*** INTO DETECTED OVERFLOW EXCEPTION\n",      //  3
+	"*** OUT OF BOUNDS EXCEPTION\n",               //  4
+	"*** INVALID OPCODE EXCEPTION\n",              //  5
+	"*** NO COPROCESSOR EXCEPTION\n",              //  6
+	"*** DOUBLE FAULT EXCEPTION\n",                //  7
+	"*** COPROCESSOR SEGMENT OVERRUN EXCEPTION\n", //  8
+	"*** BAD TSS EXCEPTION\n",                     //  9
+	"*** SEGMENT NOT PRESENT EXCEPTION\n",         // 10
+	"*** STACK FAULT EXCEPTION\n",                 // 11
+	"*** GENERAL PROTECTION FAULT EXCEPTION\n",    // 12
+	"*** PAGE FAULT EXCEPTION\n",                  // 13
+	"*** UNKNOWN INTERRUPT EXCEPTION\n",           // 14
+	"*** COPROCESSOR FAULT EXCEPTION\n",           // 15
+	"*** ALIGNMENT CHECK EXCEPTION\n",             // 16
+	"*** MACHINE CHECK EXCEPTION\n",               // 17
+  "*** I FUCKED UP THE EXCEPTION TEXT HERE\n",   // 18  // uhm.. yeah..
 };
 
-struct cpu_state *interrupt_handler (struct cpu_state *frame) {
-  struct cpu_state *retframe = frame;
-
-  puts ("Interrupt!");
+void interrupt_handler (struct cpu_state *frame) {
+  // Exceptions
   if (frame->intr <= 0x1F) {
+    // Print exception message
     puts (exception_messages[frame->intr]);
+
+    /*
+    uint32_t gs, fs, es, ds;
+    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    uint32_t intr, error;
+    uint32_t eip, cs, eflags, useresp, ss;
+    */
+
+    // Print debug information
+    uint8_t buf[13];
+    puts ("Interrupt number: "); puts (itoa (frame->intr, buf));
+    puts ("\nError number: "); puts (itoa (frame->error, buf));
+    puts ("\nCPU State:");
+    puts ("\nGS: "); puts (itoa (frame->gs, buf));
+    puts ("\tFS: "); puts (itoa (frame->fs, buf));
+    puts ("\tES: "); puts (itoa (frame->es, buf));
+    puts ("\tDS: "); puts (itoa (frame->ds, buf));
+    puts ("\nEDI: "); puts (itoa (frame->edi, buf));
+    puts ("\tESI: "); puts (itoa (frame->esi, buf));
+    puts ("\tEBP: "); puts (itoa (frame->ebp, buf));
+    puts ("\tESP: "); puts (itoa (frame->esp, buf));
+    puts ("\nEBX: "); puts (itoa (frame->ebx, buf));
+    puts ("\tEDX: "); puts (itoa (frame->edx, buf));
+    puts ("\tECX: "); puts (itoa (frame->ecx, buf));
+    puts ("\tEAX: "); puts (itoa (frame->eax, buf));
+    puts ("\nEIP: "); puts (itoa (frame->eip, buf));
+    puts ("\tCS: "); puts (itoa (frame->cs, buf));
+    puts ("\tEFLAGS: "); puts (itoa (frame->eflags, buf));
+    puts ("\tUSERESP: "); puts (itoa (frame->useresp, buf));
+    puts ("\tSS: "); puts (itoa (frame->ss, buf));
+
     while (true) {
-      asm volatile ("cli; hlt");
+      asm ("cli; hlt");
     }
   }
+
+  // Hardware interrupts
   if (frame->intr >= 0x20 && frame->intr <= 0x2F) {
     if (frame->intr == 0x28) {
-      // EOI to slave interrupt controller
+      // Send EOI to slave interrupt controller
       outb (0xA0, 0x20);
     }
-    // EOI to master interrupt controller
+    // Send EOI to master interrupt controller
     outb (0x20, 0x20);
   }
-
-  return retframe;
 }

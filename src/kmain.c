@@ -10,29 +10,23 @@ void init (void) {
 
   // Initialize VGA TextMode
   terminal_init ();
-  puts ("[OK] Setting up textmode\n");
+
+  // Say hello
+  puts ("RektOS 2 is booting...\n");
 
   // Setup GDT
   gdt_init ();
   puts ("[OK] Setting up GDT\n");
 
-  // Setup IDT
-  idt_init ();
-  puts ("[OK] Setting up IDT\n");
-
   // Setup PIC
   pic_init ();
   puts ("[OK] Setting up PIC\n");
 
-  // Tests
-  puts ("Testing divide by zero\n");
-  int i = 10 / 0;
-  puts ("Testing overflow\n");
-  int8_t x = 99999999999999999999;
-
-  puts ("lolwtf");
+  // Setup IDT
+  idt_init ();
+  puts ("[OK] Setting up IDT\n");
 
   while (true) {
-    puts ("x");
+    asm ("cli; hlt");
   }
 }
