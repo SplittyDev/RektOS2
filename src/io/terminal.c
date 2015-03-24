@@ -33,7 +33,7 @@ void putc (const char chr) {
       break;
     // Tab
     case 0x09:
-      terminal_x = (terminal_x + 4) & ~(4 - 1);
+      terminal_x = (terminal_x + 8) & ~(8 - 1);
       break;
     // Carriage return
     case '\r':

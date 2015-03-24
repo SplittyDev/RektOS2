@@ -14,7 +14,7 @@
 .section .text
 
 .extern init
-.extern interrupt_handler
+.extern idt_handle_general
 
 .global _start
 .global isr_wrapper
@@ -49,7 +49,7 @@ isr_wrapper:
   mov %ax, %gs
   mov %esp, %eax
   push %eax
-  mov $interrupt_handler, %eax
+  mov $idt_handle_general, %eax
   call %eax
   pop %eax
   pop %gs

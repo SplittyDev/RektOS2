@@ -11,9 +11,6 @@ void init (void) {
   // Initialize VGA TextMode
   terminal_init ();
 
-  // Say hello
-  puts ("RektOS 2 is booting...\n");
-
   // Setup GDT
   gdt_init ();
   puts ("[OK] Setting up GDT\n");
@@ -26,10 +23,11 @@ void init (void) {
   idt_init ();
   puts ("[OK] Setting up IDT\n");
 
-  puts ("Dividing by zero\n");
   putc (1 / 0);
 
+  // Enable Interrupts
+  asm volatile ("sti");
+
   while (true) {
-    asm ("cli; hlt");
   }
 }

@@ -26,8 +26,14 @@ struct idt_entry idt[IDT_ENTRIES];
 void idt_init (void);
 void idt_load (void);
 void idt_set_gate(uint8_t, uint32_t, uint16_t, uint8_t);
-void interrupt_handler (struct cpu_state *);
+void idt_install_handler (int8_t, void (*)(struct cpu_state *));
+void idt_uninstall_handler (int8_t);
+void idt_handle_irq (struct cpu_state *);
+void idt_handle_syscall (struct cpu_state *);
+void idt_handle_general (struct cpu_state *);
+void idt_handle_exception (struct cpu_state *);
 
+// Exceptions (boot.S)
 extern void isr0 (void);
 extern void isr1 (void);
 extern void isr2 (void);
@@ -48,6 +54,7 @@ extern void isr16 (void);
 extern void isr17 (void);
 extern void isr18 (void);
 
+// Reserved exceptions (boot.S)
 extern void isr19 (void);
 extern void isr20 (void);
 extern void isr21 (void);
@@ -62,6 +69,7 @@ extern void isr29 (void);
 extern void isr30 (void);
 extern void isr31 (void);
 
+// IRQs (boot.S)
 extern void isr32 (void);
 extern void isr33 (void);
 extern void isr34 (void);
