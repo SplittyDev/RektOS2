@@ -11,7 +11,9 @@
 void keyboard_init (void);
 void keyboard_install_handler (void);
 void keyboard_uninstall_handler (void);
-void keyboard_send_command (uint8_t);
 void keyboard_handler (struct cpu_state *);
+void keyboard_send_command (uint8_t);
+void keyboard_clear_buffer (void);
+uint8_t keyboard_self_test (void);
 
 #endif

@@ -8,10 +8,15 @@ void keyboard_init (void) {
   // Install handler
   keyboard_install_handler ();
 
+  // Self-Test
+  uint8_t selftest = keyboard_self_test ();
+  if (selftest)
+    puts ("Keyboard self-test successful.\n");
+  else
+    puts ("Keyboard self-test failed.\n");
+
   // Empty buffer
-  while (inb (CONTROL_REGISTER) & 0x1) {
-    inb (DATA_REGISTER);
-  }
+  keyboard_clear_buffer ();
 
   // Clear LEDs
   keyboard_send_command (0xED);
@@ -25,6 +30,16 @@ void keyboard_init (void) {
   keyboard_send_command (0xF4);
 }
 
+void keyboard_clear_buffer (void) {
+  while (inb (CONTROL_REGISTER) & 0x1)
+    inb (DATA_REGISTER);
+}
+
+uint8_t keyboard_self_test (void) {
+  outb (CONTROL_REGISTER, 0xAA);
+  return inb (DATA_REGISTER) == 0x55;
+}
+
 void keyboard_install_handler (void) {
   idt_install_handler (KEYBOARD_IRQ, keyboard_handler);
 }
@@ -34,11 +49,8 @@ void keyboard_uninstall_handler (void) {
 }
 
 void keyboard_send_command (uint8_t com) {
-  do {
-    while (inb (CONTROL_REGISTER) & 0x2);
-    outb (DATA_REGISTER, com);
-    while ((inb (CONTROL_REGISTER) & 0x1) == 0);
-  } while (inb (DATA_REGISTER) == 0xFE);
+  while (inb (CONTROL_REGISTER) & 0x2);
+  outb (DATA_REGISTER, com);
 }
 
 uint8_t keymap_en[128] = {
