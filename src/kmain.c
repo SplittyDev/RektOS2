@@ -2,6 +2,8 @@
 #include <terminal.h>
 #include <gdt.h>
 #include <idt.h>
+#include <pic.h>
+#include <pit.h>
 
 // Main entry point
 void init (void) {
@@ -23,11 +25,12 @@ void init (void) {
   idt_init ();
   puts ("[OK] Setting up IDT\n");
 
-  putc (1 / 0);
+  // Setup PIT with 100hz
+  pit_init ();
+  puts ("[OK] Initializing PIT\n");
 
   // Enable Interrupts
   asm volatile ("sti");
 
-  while (true) {
-  }
+  while (true);
 }
