@@ -4,6 +4,8 @@
 #include <types.h>
 #include <idt.h>
 
+#define PIT_IRQ   0
+
 uint32_t pit_ticks;
 
 void pit_init (void);

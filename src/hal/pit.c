@@ -4,9 +4,14 @@
 #include <ports.h>
 
 void pit_init (void) {
+  // Initialize the ticks variable
   pit_ticks = 0;
-  pit_set_frequency (100);
+
+  // Install IRQ handler
   pit_install_handler ();
+
+  // Set frequency to 100hz
+  pit_set_frequency (100);
 }
 
 void pit_set_frequency (uint8_t hz) {
@@ -17,11 +22,11 @@ void pit_set_frequency (uint8_t hz) {
 }
 
 void pit_install_handler (void) {
-  idt_install_handler (0, pit_handler);
+  idt_install_handler (PIT_IRQ, pit_handler);
 }
 
 void pit_uninstall_handler (void) {
-  idt_uninstall_handler (0);
+  idt_uninstall_handler (PIT_IRQ);
 }
 
 void pit_handler (struct cpu_state *frame) {
