@@ -4,6 +4,7 @@
 #include <terminal.h>
 #include <ports.h>
 #include <string.h>
+#include <keyboard.h>
 
 struct {
   uint16_t limit;
@@ -55,21 +56,21 @@ void idt_init (void) {
 
 	// IRQs
 	idt_set_gate (32, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (33, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (34, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (35, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (36, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (37, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (38, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (39, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (40, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (41, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (42, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (43, (unsigned)isr32, 0x08, 0x8E);
-  idt_set_gate (44, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (45, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (46, (unsigned)isr32, 0x08, 0x8E);
-	idt_set_gate (47, (unsigned)isr32, 0x08, 0x8E);
+	idt_set_gate (33, (unsigned)isr33, 0x08, 0x8E);
+	idt_set_gate (34, (unsigned)isr34, 0x08, 0x8E);
+	idt_set_gate (35, (unsigned)isr35, 0x08, 0x8E);
+	idt_set_gate (36, (unsigned)isr36, 0x08, 0x8E);
+	idt_set_gate (37, (unsigned)isr37, 0x08, 0x8E);
+	idt_set_gate (38, (unsigned)isr38, 0x08, 0x8E);
+	idt_set_gate (39, (unsigned)isr39, 0x08, 0x8E);
+	idt_set_gate (40, (unsigned)isr40, 0x08, 0x8E);
+	idt_set_gate (41, (unsigned)isr41, 0x08, 0x8E);
+	idt_set_gate (42, (unsigned)isr42, 0x08, 0x8E);
+	idt_set_gate (43, (unsigned)isr43, 0x08, 0x8E);
+  idt_set_gate (44, (unsigned)isr44, 0x08, 0x8E);
+	idt_set_gate (45, (unsigned)isr45, 0x08, 0x8E);
+	idt_set_gate (46, (unsigned)isr46, 0x08, 0x8E);
+	idt_set_gate (47, (unsigned)isr47, 0x08, 0x8E);
 
   // Load IDT
   idt_load ();
